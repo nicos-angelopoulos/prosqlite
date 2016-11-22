@@ -77,8 +77,11 @@ _v2 is designed for garbage collected languages, see http://sqlite.org/c3ref/clo
 
 Thanks to Wolfram Diestel for spotting a bug in opening 2 dbs with distinct aliases.
 
+Thanks to Steve Moyle for contributing safe_column_names/2 (Nov 2016).
+
 @version 1.0, 2014/12/24
 @version 1.1, 2016/10/9  changed to sqlite3_close() and fixed alias bug
+@version 1.2, 2016/11/22 added safe_column_names/2
 @license	MIT
 @author Nicos Angelopoulos
 @author Sander Canisius
@@ -109,7 +112,7 @@ arity_flag_values( [arity,unary,both,palette] ).
 % sqlite_version( 0:1:2, date(2013,11,1) ).
 % sqlite_version( 1:0:0, date(2014,12,24) ).
 % sqlite_version( 1:1:0, date(2016,10,9) ).
-sqlite_version( 1:2:0, date(2016,11,22) ).    % added 
+sqlite_version( 1:2:0, date(2016,11,22) ).
 
 %% sqlite_binary_version( -Version, -Date ).
 %  The current version of the binaries. If the installed binaries are not compiled from
