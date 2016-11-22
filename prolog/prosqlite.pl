@@ -108,7 +108,8 @@ arity_flag_values( [arity,unary,both,palette] ).
 %
 % sqlite_version( 0:1:2, date(2013,11,1) ).
 % sqlite_version( 1:0:0, date(2014,12,24) ).
-sqlite_version( 1:1:0, date(2016,10,9) ).
+% sqlite_version( 1:1:0, date(2016,10,9) ).
+sqlite_version( 1:2:0, date(2016,11,22) ).    % added 
 
 %% sqlite_binary_version( -Version, -Date ).
 %  The current version of the binaries. If the installed binaries are not compiled from
@@ -550,7 +551,9 @@ sqlite_establish_table_typed( Table, Pname, Columns, Conn, Mod, ArityF, Arity ) 
 sqlite_holds( AliasOr, Name, _Arity, Type, Columns, Args ) :-
      sqlite_alias_connection( AliasOr, Conn ),
      pl_as_predicate_to_sql_ready_data( Type, Columns, Args, KnwnClmPrs, UnKnwnCs, UnKnwnAs ),
-     sqlite_holds_unknown( UnKnwnCs, UnKnwnAs, KnwnClmPrs, Name, Columns, Conn ).
+	safe_column_names(Columns, SafeColumns),
+     safe_column_names(UnKnwnCs, SafeUnKnwnCs),
+     sqlite_holds_unknown( SafeUnKnwnCs, UnKnwnAs, KnwnClmPrs, Name, SafeColumns, Conn ).
 
 /* fixme:
 sqlite_holds_unknown( [], _UnKnwnAs, KnwnClmPrs, Name, Columns, Conn ) :-
@@ -767,3 +770,30 @@ arity_option( _Opts, arity ). % default for this flag, although we should
 kv_decompose( [], [], [] ).
 kv_decompose( [K-V|T], [K|Ks], [V|Vs] ) :-
      kv_decompose( T, Ks, Vs ).
+
+%!	safe_column_names(+Cols, -SafeCols) is det
+%
+%	@author: Steve Moyle
+%
+%	+Cols is a list of column names stored in the sqlite db
+%	-SafeCols is the each element of the input is the atom wrapped
+%	in [].
+%
+%     sqlite (and possibly other RDBMSs) does not like columns with
+%     names including periods like:
+%
+%     'id.orig_h'
+%      They need to be refered to in the select statement as:
+%      [id.orig_h]
+%
+%      ?- safe_column_names(['id.orig_h'], S).
+%      Correct to: "prosqlite:safe_column_names(['id.orig_h'],S)"? yes
+%      S = ['[id.orig_h]'].
+%
+safe_column_names([], []).
+safe_column_names([Col | Cols], [SafeCol | SafeCols]) :-
+	safe_column_name(Col, SafeCol),
+	safe_column_names(Cols, SafeCols).
+
+safe_column_name(Col, SafeCol) :-
+		format(atom(SafeCol), '[~w]', [Col]).
