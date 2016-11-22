@@ -87,7 +87,7 @@ Thanks to Steve Moyle for contributing safe_column_names/2 (Nov 2016).
 @author Sander Canisius
 @see Sander Canisius, Nicos Angelopoulos and Lodewyk Wessels. proSQLite: Prolog file based databases via an SQLite interface.  In the proceedings of Practical Aspects of Declarative languages (PADL 2013), (2013, Rome, Italy).
 @see Sander Canisius, Nicos Angelopoulos and Lodewyk Wessels.  Exploring file based databases via an Sqlite interface.  In the ICLP Workshop on Logic-based methods in Programming Environments, p. 2-9, (2012, Budapest, Hungary).
-@see http://stoics.org.uk/~nicos/pbs/wlpe2012_sqlite.pdf
+@see http://stoics.org.uk/~nicos/pbs/padl2013-prosqlite.pdf
 @see http://stoics.org.uk/~nicos/sware/prosqlite
 @see http://stoics.org.uk/~nicos/sware/db_facts
 @see http://www.sqlite.org/
