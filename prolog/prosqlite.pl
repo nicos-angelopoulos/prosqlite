@@ -82,7 +82,8 @@ Thanks to Steve Moyle for contributing safe_column_names/2 (Nov 2016).
 @version 1.0, 2014/12/24
 @version 1.1, 2016/10/9  changed to sqlite3_close() and fixed alias bug
 @version 1.2, 2016/11/22 added safe_column_names/2
-@license	MIT
+@version 1.5, 2018/3/18  fixed blobs support (see examples/two.pl), and logic for already opened file
+@license    MIT
 @author Nicos Angelopoulos
 @author Sander Canisius
 @see Sander Canisius, Nicos Angelopoulos and Lodewyk Wessels. proSQLite: Prolog file based databases via an SQLite interface.  In the proceedings of Practical Aspects of Declarative languages (PADL 2013), (2013, Rome, Italy).
@@ -109,10 +110,8 @@ arity_flag_values( [arity,unary,both,palette] ).
 %% sqlite_version( -Version, -Date ).
 %  The current version. Version is a Mj:Mn:Fx term, and date is a date(Y,M,D) term.
 %
-% sqlite_version( 0:1:2, date(2013,11,1) ).
-% sqlite_version( 1:0:0, date(2014,12,24) ).
-% sqlite_version( 1:1:0, date(2016,10,9) ).
-sqlite_version( 1:2:0, date(2016,11,22) ).
+% sqlite_version( 1:4:0, date(2018,3,18) ).   % proper blob support & opened_already with associated portray_message/2 fix
+sqlite_version( 1:5:0, date(2016,3,18) ).  
 
 %% sqlite_binary_version( -Version, -Date ).
 %  The current version of the binaries. If the installed binaries are not compiled from
@@ -242,10 +241,13 @@ The latter can be interrogated by
 ==
 which will return the phone number(s) associated with individual named by =|naku|=.
 
+@author nicos angelopoulos
+@version  0.2 2018/03/17,    fixed logic for existing connection to a file (existing alias is returned)
 
-See source file examples/predicated.pl .
+@see examples/predicated.pl .
+@see pack(prosqlite/examples/two.pl)
 
-     */
+*/
 
 sqlite_connect(FileIn, Conn, OptIn) :-
      to_list( OptIn, Opts ),
@@ -271,24 +273,28 @@ sqlite_connect_1(File1, Conn, Opts) :-
 sqlite_connect_1(File, Alias, Opts) :-
      sqlite_alias(Opts, Conn, Alias),
      ( sqlite_connection(_Conn1,File,Alias1) ->
-          portray_message( informational, file_already_open(File,Alias1) )
-          ;
-          true
-     ),
-	( (memberchk(verbose(Verb),Opts),Verb==true) -> 
-          print_message( informational, sqlite(db_at(File)) )
-		;
-		true
-	),
-     c_sqlite_connect(File, Conn),
-     asserta( sqlite_connection(Alias,File,Conn) ),
-     ( sqlite_establish_predicates(Opts, Conn) ->
-          true
-          ;
-          retractall( sqlite_connection(Alias,File,Conn) ),
-          c_sqlite_disconnect(Conn),
-          sqlite_error( predicated_creation_error(File,Alias) )
-     ).
+        Alias1 = Alias,
+        ( (memberchk(verbose(Verb),Opts),Verb==true) -> 
+                print_message( informational, sqlite(file_already_open(File,Alias1)) )
+                ;
+                true
+        )
+        ;
+        ( (memberchk(verbose(Verb),Opts),Verb==true) -> 
+            print_message( informational, sqlite(db_at(File)) )
+            ;
+            true
+        ),
+        c_sqlite_connect(File, Conn),
+        asserta( sqlite_connection(Alias,File,Conn) ),
+        ( sqlite_establish_predicates(Opts, Conn) ->
+            true
+            ;
+            retractall( sqlite_connection(Alias,File,Conn) ),
+            c_sqlite_disconnect(Conn),
+            sqlite_error( predicated_creation_error(File,Alias) )
+        )
+    ).
 
 /*
 sqlite_connect(File, Conn, Opts) :-
@@ -375,23 +381,23 @@ sqlite_query(Alias, Query, Row) :-
 %
 %
 sqlite_format_query(Alias, Format-Arguments, Row) :-
-	format(atom(Query), Format, Arguments),
-	sqlite_query(Alias, Query, Row).
+    format(atom(Query), Format, Arguments),
+    sqlite_query(Alias, Query, Row).
 
 %% sqlite_current_table(+Connection, -Table).
 %
 %  Return or interrogate tables in the Sqlite database associated with Connection.
 %
 sqlite_current_table(Alias, Table) :-
-	var( Table ),
-	!,
-	sqlite_query(Alias, 'SELECT name FROM sqlite_master WHERE type = "table"', row(Table)).
+    var( Table ),
+    !,
+    sqlite_query(Alias, 'SELECT name FROM sqlite_master WHERE type = "table"', row(Table)).
 sqlite_current_table(Alias, Table) :-
-	ground( Table ),
-	sqlite_query(Alias, 'SELECT name FROM sqlite_master WHERE type = "table"', row(TableIn)),
-	%13.10.26: have a look at the C code above to see if 'row(Table)' can work on the above line.
-	Table = TableIn,
-	!.
+    ground( Table ),
+    sqlite_query(Alias, 'SELECT name FROM sqlite_master WHERE type = "table"', row(TableIn)),
+    %13.10.26: have a look at the C code above to see if 'row(Table)' can work on the above line.
+    Table = TableIn,
+    !.
 
 %% sqlite_current_table(+Connection, ?Table, -Facet ).
 %
@@ -407,7 +413,7 @@ sqlite_current_table(Connection, Table, Facet ) :-
 %
 sqlite_table_column( Alias, Table, Column ) :-
      set_table( Alias, Table ),
-	sqlite_format_query(Alias, 'PRAGMA table_info(~w)'-Table, row(_, Column, _, _, _, _)).
+    sqlite_format_query(Alias, 'PRAGMA table_info(~w)'-Table, row(_, Column, _, _, _, _)).
 
 %% sqlite_table_column(+Connection, ?Table, ?Column, -Facet).
 %
@@ -419,10 +425,10 @@ sqlite_table_column( Alias, Table, Column ) :-
 %    *  primary_key(Key)  is this column part of the primary key ?
 %
 sqlite_table_column(Alias, Table, Column, Facet) :-
-     set_table( Alias, Table ),
-	sqlite_format_query(Alias, 'PRAGMA table_info(~w)'-Table, Row ),
-	Row = row(_, Column, _, _, _, _),
-     sqlite_pragma_info_facet( Row, Facet ).
+    set_table( Alias, Table ),
+    sqlite_format_query(Alias, 'PRAGMA table_info(~w)'-Table, Row ),
+    Row = row(_, Column, _, _, _, _),
+    sqlite_pragma_info_facet( Row, Facet ).
 
 sqlite_pragma_info_facet( row(Nth0,_,_,_,_,_), position(Nth0) ).
 sqlite_pragma_info_facet( row(_,_,Dtype,_,_,_), data_type(Dtype) ).
@@ -441,10 +447,10 @@ sqlite_pragma_info_facet( row(_,_,_,_,_,Key), primary_key(Key) ).
 sqlite_pragma( Alias, Pragma-Par, Row ) :-
      !,
      atomic_list_concat( ['PRAGMA',Pragma,'(~w)'],' ', Query ), 
-	sqlite_format_query( Alias, Query-Par, Row ).
+    sqlite_format_query( Alias, Query-Par, Row ).
 sqlite_pragma( Alias, Pragma, Row ) :-
      atomic_list_concat( ['PRAGMA',Pragma],' ', Query ), 
-	sqlite_query( Alias, Query, Row ).
+    sqlite_query( Alias, Query, Row ).
 
 % pragmas_info( [...,encoding,...,secure_delete,synchronous,temp_store,writable_schema] ).
 pragmas_comm( [shrink_memory] ).
@@ -463,7 +469,7 @@ set_table( Alias, Table ) :-
 %
 sqlite_table_count(Alias, Table, Count) :-
      Sel = 'Select count (*) from ~w',
-	sqlite_format_query(Alias, Sel-Table, row(Count)),
+    sqlite_format_query(Alias, Sel-Table, row(Count)),
      !.
 
 /** sqlite_date_sql_atom( Date, Sql ).
@@ -554,7 +560,7 @@ sqlite_establish_table_typed( Table, Pname, Columns, Conn, Mod, ArityF, Arity ) 
 sqlite_holds( AliasOr, Name, _Arity, Type, Columns, Args ) :-
      sqlite_alias_connection( AliasOr, Conn ),
      pl_as_predicate_to_sql_ready_data( Type, Columns, Args, KnwnClmPrs, UnKnwnCs, UnKnwnAs ),
-	safe_column_names(Columns, SafeColumns),
+    safe_column_names(Columns, SafeColumns),
      safe_column_names(UnKnwnCs, SafeUnKnwnCs),
      sqlite_holds_unknown( SafeUnKnwnCs, UnKnwnAs, KnwnClmPrs, Name, SafeColumns, Conn ).
 
@@ -639,7 +645,7 @@ look_for_pair( Pair, K, V ) :-
      look_for_pair_silent( Pair, K, V ),
      !.
 look_for_pair( Term, _A, _B ) :-
-	% print_message(informational, pack(git_fetch(Dir))).
+    % print_message(informational, pack(git_fetch(Dir))).
      sqlite_error( pair_representation(Term) ).
      % type_error( 'Binary compound with functor {=,-,:}', Term ). 
      % Type = 'Binary compound with functor {=,-,:}',
@@ -670,7 +676,7 @@ sqlite_fail( Type, Term ) :-
 :- multifile prolog:message//1.
 
 prolog:message(sqlite(Message)) -->
-	message(Message).
+    message(Message).
 
 
 message( pair_representation(Term) ) -->
@@ -774,13 +780,13 @@ kv_decompose( [], [], [] ).
 kv_decompose( [K-V|T], [K|Ks], [V|Vs] ) :-
      kv_decompose( T, Ks, Vs ).
 
-%!	safe_column_names(+Cols, -SafeCols) is det
+%!  safe_column_names(+Cols, -SafeCols) is det
 %
-%	@author: Steve Moyle
+%   @author: Steve Moyle
 %
-%	+Cols is a list of column names stored in the sqlite db
-%	-SafeCols is the each element of the input is the atom wrapped
-%	in [].
+%   +Cols is a list of column names stored in the sqlite db
+%   -SafeCols is the each element of the input is the atom wrapped
+%   in [].
 %
 %     sqlite (and possibly other RDBMSs) does not like columns with
 %     names including periods like:
@@ -795,8 +801,8 @@ kv_decompose( [K-V|T], [K|Ks], [V|Vs] ) :-
 %
 safe_column_names([], []).
 safe_column_names([Col | Cols], [SafeCol | SafeCols]) :-
-	safe_column_name(Col, SafeCol),
-	safe_column_names(Cols, SafeCols).
+    safe_column_name(Col, SafeCol),
+    safe_column_names(Cols, SafeCols).
 
 safe_column_name(Col, SafeCol) :-
-		format(atom(SafeCol), '[~w]', [Col]).
+        format(atom(SafeCol), '[~w]', [Col]).

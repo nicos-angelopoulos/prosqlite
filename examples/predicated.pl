@@ -85,7 +85,7 @@ create( C ) :-
 insert( I ) :-
      I = 'Insert into phones (name, telephone, address) values ("naku","0044","uk");'.
 insert( I ) :-
-     I = 'Insert into phones (name, telephone, address) values ("άμπελος","0090","turkey");'.
+     I = 'Insert into phones (name, telephone, address) values ("άμπελος","0030","greece");'.
 insert( I ) :-
      I = 'Insert into phones (name, telephone, address) values ("Pour ce garçon être sur une île, y avoir des histoires de cœur ambiguës et vider un fût de bière sur un canoë entouré par des caïmans, ne fut pas un mince affaire.","0033","france");'.
      % I = 'Insert into phones (name, telephone, address) values ("ozzy","0090","turkey");'.

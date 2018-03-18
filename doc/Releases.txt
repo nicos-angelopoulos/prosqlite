@@ -1,0 +1,10 @@
+---   Releases   ---
+--------------------
+
+1.4         @   18.30.18
+     18.03.17   FIXED:   sqlite_connect( +, -, exists(false ), was broken when called twice (same Handle returned)
+                         better (proper) blob support
+                DOC:     added examples/two.pl
+                FIXED:   remove call to portray message/2 (-> print_message/2)
+                FIXED:   broken logic of file that is already open
+                RETAB:   prolog/prosqlite.pl

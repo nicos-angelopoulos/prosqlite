@@ -11,24 +11,56 @@ functor_t minus2_functor;
 static atom_t ATOM_true;
 static atom_t ATOM_false;
 
+typedef struct sqlite_blob_rec
+{ sqlite3  *dbh;
+  // int       bl_val;
+  atom_t    symbol;  // this makes the rec aware of its blob handle (i think), see acquire_sqlite_blob()
+} sqlite_blob_rec;
 
-int PL_SQLite_Connection_release(atom_t connection)
-{
-  printf("release\n");
-  return 1;
+// int PL_SQLite_Connection_release(atom_t connection)
+// {
+  // printf("release\n");
+  // return 1;
+// }
+
+static int
+release_sqlite_blob(atom_t symbol)
+{ sqlite_blob_rec *blr = PL_blob_data(symbol, NULL, NULL );
+	PL_free(blr);
+	return TRUE;
 }
 
+static int
+compare_sqlite_blob(atom_t a, atom_t b)
+{ sqlite_blob_rec *ara = PL_blob_data(a, NULL, NULL);
+  sqlite_blob_rec *arb = PL_blob_data(b, NULL, NULL);
+  return ( ara > arb ?  1 :
+	   ara < arb ? -1 : 0
+	 );
+}
+
+static int
+write_sqlite_blob(IOSTREAM *s, atom_t symbol, int flags)
+{ sqlite_blob_rec *blr= PL_blob_data(symbol, NULL, NULL);
+  Sfprintf(s, "<sqlite>(%p)", blr);
+  return TRUE;
+}
+
+static void
+acquire_sqlite_blob(atom_t symbol)
+{ sqlite_blob_rec *blr = PL_blob_data(symbol, NULL, NULL);
+  blr->symbol = symbol;
+}
 
 PL_blob_t PL_SQLite_Connection = {
   PL_BLOB_MAGIC,
   PL_BLOB_UNIQUE | PL_BLOB_NOCOPY,
-  "SQLiteConnection",
-  PL_SQLite_Connection_release, // release
-  0, // compare
-  0, // write
-  0 // acquire
+  "sqlite",              // "SQLiteConnection",
+  release_sqlite_blob,  // PL_SQLite_Connection_release, // release
+  compare_sqlite_blob,  // 0, // compare
+  write_sqlite_blob,    // write
+  acquire_sqlite_blob   // acquire
 };
-
 
 static foreign_t c_sqlite_connect(term_t filename, term_t connection)
 {
@@ -36,10 +68,14 @@ static foreign_t c_sqlite_connect(term_t filename, term_t connection)
 
   if (PL_get_atom_chars(filename, &filename_c))
   {
+    sqlite_blob_rec *crec;
     sqlite3* handle;
+
     if (sqlite3_open(filename_c, &handle) == SQLITE_OK)
     {
-      return PL_unify_blob(connection, handle, sizeof(sqlite3*),
+      crec = calloc(1,sizeof(*crec));
+      crec->dbh = handle;
+      return PL_unify_blob(connection, crec, sizeof(*crec),
 			   &PL_SQLite_Connection);
     }
   }
@@ -52,7 +88,10 @@ static foreign_t c_sqlite_connect(term_t filename, term_t connection)
 static foreign_t c_sqlite_disconnect(term_t connection)
 {
   sqlite3* db;
-  if (PL_get_blob(connection, (void**)&db, 0, 0))
+  sqlite_blob_rec *conn;
+
+  if (PL_get_blob(connection, (void**)&conn, 0, 0))
+   db = conn->dbh;
   {
     if (sqlite3_close_v2(db) == SQLITE_OK)  // 16.08.27, changed from sqlite3_close(db) - Christian
       { 
@@ -173,9 +212,11 @@ static foreign_t c_sqlite_version(term_t ver, term_t datem)
 {
     term_t tmp = PL_new_term_ref();
 	 // 1:0:0,  date(2014,12,23)
-    if ( PL_unify_term(tmp,PL_FUNCTOR_CHARS,":",2,PL_INT, 1, PL_INT, 0) &&    // Minor + Fix 
+    if ( PL_unify_term(tmp,PL_FUNCTOR_CHARS,":",2,PL_INT, 3, PL_INT, 0) &&    // Minor + Fix 
          PL_unify_term(ver,PL_FUNCTOR_CHARS,":",2,PL_INT, 1, PL_TERM, tmp ) &&   // Major
-         PL_unify_term(datem,PL_FUNCTOR_CHARS,"date",3,PL_INT, 2016, PL_INT, 10, PL_INT, 9) )
+         PL_unify_term(datem,PL_FUNCTOR_CHARS,"date",3,PL_INT, 2018, PL_INT, 3, PL_INT, 17) )
+         // 1:1:0, 2016,10,9
+         // 1:3:0, 2018,3,17,  proper support for blobs (see examples/two.pl)
       return TRUE;
       else
       return FALSE;
@@ -247,6 +288,12 @@ static foreign_t c_sqlite_query(term_t connection, term_t query, term_t row,
 				 control_t handle)
 {
   sqlite3* db;
+  sqlite_blob_rec *conn;
+
+  // conn = &connection;
+
+  // db = connection->dbh;
+
   query_context* context;
   term_t tmp = PL_new_term_ref();
   int changes = 0;
@@ -254,7 +301,8 @@ static foreign_t c_sqlite_query(term_t connection, term_t query, term_t row,
   switch (PL_foreign_control(handle))
   {
   case PL_FIRST_CALL:
-    PL_get_blob(connection, (void**)&db, 0, 0);
+    PL_get_blob(connection, (void**)&conn, 0, 0);
+   db = conn->dbh;
 
     char* query_c;
     sqlite3_stmt* statement;
