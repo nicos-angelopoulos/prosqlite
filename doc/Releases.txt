@@ -1,6 +1,9 @@
 ---   Releases   ---
 --------------------
 
+1.6         @   20.05.29
+     20.05.29   BINS:    new dlls for SWI 8.2
+
 1.4         @   18.30.18
      18.03.17   FIXED:   sqlite_connect( +, -, exists(false ), was broken when called twice (same Handle returned)
                          better (proper) blob support

@@ -1,5 +1,5 @@
 name(prosqlite).
-version('1.5').
+version('1.6').
 title('An SWI-Prolog interface to SQLite').
 keywords([sqlite,database,sql]).
 author( 'Sander Canisius', 'http://bioinformatics.nki.nl/~canisius' ).
