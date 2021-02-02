@@ -1,6 +1,9 @@
 ---   Releases   ---
 --------------------
 
+1.7
+     21.02.02   DEPS:    explicit load of shlib
+
 1.6         @   20.05.29
      20.05.29   BINS:    new dlls for SWI 8.2
 

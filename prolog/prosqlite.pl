@@ -19,10 +19,11 @@
             sqlite_citation/2           % -Atom, Bibterm
           ] ).
 
+:- use_module(library(shlib)).
 :- load_foreign_library(foreign(prosqlite)).
 
-:- dynamic( sqlite_connection/3 ).
-:- dynamic( sqlite_db:sqlite_asserted/4 ).
+:- dynamic(sqlite_connection/3).
+:- dynamic(sqlite_db:sqlite_asserted/4).
 
 /** <module>  proSQLite: a Prolog interface to the SQLite database system.
 
