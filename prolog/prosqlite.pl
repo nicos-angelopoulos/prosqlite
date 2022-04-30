@@ -256,6 +256,7 @@ which will return the phone number(s) associated with individual named by =|naku
 
 @author nicos angelopoulos
 @version  0.2 2018/03/17,    fixed logic for existing connection to a file (existing alias is returned)
+@version  0.3 2022/04/30,    add permissions error message, if new sqlite file cannot be created
 
 @see examples/predicated.pl .
 @see pack(prosqlite/examples/two.pl)
