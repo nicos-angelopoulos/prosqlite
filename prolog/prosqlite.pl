@@ -83,8 +83,8 @@ Thanks to Steve Moyle for contributing safe_column_names/2 (Nov 2016).
 @version 1.0, 2014/12/24
 @version 1.1, 2016/10/9  changed to sqlite3_close() and fixed alias bug
 @version 1.2, 2016/11/22 added safe_column_names/2
-@version 1.5, 2018/3/18  fixed blobs support (see examples/two.pl), and logic for already opened file
-@version 1.5, 2020/5/29  recompiled for SWI 8.2
+@version 1.4, 2018/3/18  fixed blobs support (see examples/two.pl), and logic for already opened file
+@version 1.6, 2020/5/29  recompiled for SWI 8.2
 @version 1.7, 2022/4/30  print message if new db file cannot be created
 @license    MIT
 @author Nicos Angelopoulos
@@ -111,11 +111,19 @@ arity_flag_values( [arity,unary,both,palette] ).
 %
 
 %% sqlite_version( -Version, -Date ).
-%  The current version. Version is a Mj:Mn:Fx term, and date is a date(Y,M,D) term.
+% 
+% The current version and its publication date.
 %
-% sqlite_version( 1:4:0, date(2018,3,18) ).   % proper blob support & opened_already with associated portray_message/2 fix
-% sqlite_version( 1:5:0, date(2016,3,18) ).  
-% sqlite_version( 1:6:0, date(2020,5,29) ).  
+% Version is a Mj:Mn:Fx term and date is a date(Y,M,D) term.
+%
+%==
+% ? sqlite_version(V, D).
+% V = 1:7:0,
+% D = date(2022, 4, 30).
+%==
+%
+%  @author nicos angelopoulos
+%
 sqlite_version( 1:7:0, date(2022,4,30) ).  
 
 %% sqlite_binary_version( -Version, -Date ).
