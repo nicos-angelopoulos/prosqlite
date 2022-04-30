@@ -1,7 +1,8 @@
 ---   Releases   ---
 --------------------
 
-1.7
+1.7         @   22.04.30
+     22.04.30   IFACE:   after github report by wdiesel/korvo added a open/3 call to get perms error if new sqlite file cannot be created
      21.02.02   DEPS:    explicit load of shlib
 
 1.6         @   20.05.29
