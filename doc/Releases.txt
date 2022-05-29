@@ -1,6 +1,9 @@
 ---   Releases   ---
 --------------------
 
+1.8
+     22.05.29   LIBS:    explicit dependency on libraries lists & apply
+
 1.7         @   22.04.30
      22.04.30   IFACE:   after github report by wdiesel/korvo added a open/3 call to get perms error if new sqlite file cannot be created
                 DOC:     versioning clean-up

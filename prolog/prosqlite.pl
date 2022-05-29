@@ -19,6 +19,12 @@
             sqlite_citation/2           % -Atom, Bibterm
           ] ).
 
+:- use_module(library(lists)).  % append/3, member/2, memberchk/2.
+:- use_module(library(apply)).  % maplist/2,3.
+:- use_module( library(debug) ).
+
+:- at_halt( sqlite_disconnect ).
+
 :- use_module(library(shlib)).
 :- load_foreign_library(foreign(prosqlite)).
 
@@ -100,9 +106,6 @@ Thanks to Steve Moyle for contributing safe_column_names/2 (Nov 2016).
 @tbd set pragmas
 
 */
-
-:- use_module( library(debug) ).
-:- at_halt( sqlite_disconnect ).
 
 /* defaults and start ups */
 arity_flag_values( [arity,unary,both,palette] ).
