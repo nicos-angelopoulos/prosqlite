@@ -2,20 +2,21 @@
 --------------------
 
 1.8
-     22.05.29   LIBS:    explicit dependency on libraries lists & apply
+     22.05.29   LIBS    explicit dependency on libraries lists & apply
+                DOC     tidy up formating and defaults in sqlite_connect/3
 
 1.7         @   22.04.30
-     22.04.30   IFACE:   after github report by wdiesel/korvo added a open/3 call to get perms error if new sqlite file cannot be created
-                DOC:     versioning clean-up
-     21.02.02   DEPS:    explicit load of shlib
+     22.04.30   IFACE   after github report by wdiesel/korvo added a open/3 call to get perms error if new sqlite file cannot be created
+                DOC     versioning clean-up
+     21.02.02   DEPS    explicit load of shlib
 
 1.6         @   20.05.29
-     20.05.29   BINS:    new dlls for SWI 8.2
+     20.05.29   BINS    new dlls for SWI 8.2
 
 1.4         @   18.30.18
-     18.03.17   FIXED:   sqlite_connect( +, -, exists(false ), was broken when called twice (same Handle returned)
-                         better (proper) blob support
-                DOC:     added examples/two.pl
-                FIXED:   remove call to portray message/2 (-> print_message/2)
-                FIXED:   broken logic of file that is already open
-                RETAB:   prolog/prosqlite.pl
+     18.03.17   FIXED   sqlite_connect( +, -, exists(false ), was broken when called twice (same Handle returned)
+                        better (proper) blob support
+                DOC     added examples/two.pl
+                FIXED   remove call to portray message/2 (-> print_message/2)
+                FIXED   broken logic of file that is already open
+                RETAB   prolog/prosqlite.pl

@@ -191,48 +191,51 @@ Connection is bound to Alias, else (b) an opaque atom is generated. If Connectio
 the opened can be accessed with Connection as a handle.
 Options is a sinlge term or a list of terms from the following:
 
-        * alias(Atom)             identify the connection as Alias in all transactions
+  * alias(Atom)
+     identify the connection as Alias (no default, interplays with Connection)
 
-        * as_predicates(AsPred)   if true, create hook predicates that map
-                                  each sqlite table to a prolog predicate.
-                                  These are created in module user, and it is 
-                                  the user's responsibility to be unique in this module.
+  * as_predicates(AsPred=false)
+     if true, create hook predicates that map each sqlite table to a prolog predicate.
+     These are created in module user, and it is the user's responsibility to be unique in this module.
 
-        * at_module(AtMod)        the module at which the predicates will be asserted at
-                                  (if as_predicates(true)) is also given). Default is =|user|=.
+  * at_module(AtMod=user)
+     the module at which the predicates will be asserted at
+     (if as_predicates(true)) is also given)
 
-        * table_as(Table,Pname,Arity)   map the table to predicate with name Pname. Arity should be
-                                  defined for this representaition as per with_arity() option.
+  * table_as(Table,Pname,Arity)
+     map the table to predicate with name Pname. Arity should be
+     defined for this representaition as per arity() option.
 
-        * arity(arity)            Arity denotes the arity of access clauses to be added in the prolog database that
-                                  correspond to SQLite tables. The default is =|arity|=, which asserts a 
-                                  predicate matching the arity of the table.
-                                  =|both|= adds two predicates, one matching the arity and a single argument one.
-                                  The later can be interrogated with something like
-                                  == 
-                                   ?-  phones( [name=naku, telephone=T] ).
-                                  ==
-                                  =|unary|= only adds the unary version, and =|palette|= adds a suite of predicates
-                                  with arities from 1 to N, where N is the number of columns.
-                                  These can be interrogated by :
-                                  == 
-                                   ?-  phones( name=Name ).
-                                   ?-  phones( name=naku, telephone=T ).
-                                   ?-  phones( [name=naku, telephone=T] ).
-                                  ==
-                                  
-                                  Predicated tables can be used to insert values to the database by virtue of all
-                                  their columns are give ground values.
+  * arity(Arity=arity)            
+     Arity denotes the arity of access clauses to be added in the prolog database that
+     correspond to SQLite tables. The default is =|arity|=, which asserts a 
+     predicate matching the arity of the table.
+     =|both|= adds two predicates, one matching the arity and a single argument one.
+     The later can be interrogated with something like
+     == 
+     ?-  phones( [name=naku, telephone=T] ).
+     ==
+     =|unary|= only adds the unary version, and =|palette|= adds a suite of predicates
+     with arities from 1 to N, where N is the number of columns.
+     These can be interrogated by :
+     == 
+     ?-  phones( name=Name ).
+     ?-  phones( name=naku, telephone=T ).
+     ?-  phones( [name=naku, telephone=T] ).
+     ==
+     
+     Predicated tables can be used to insert values to the database by virtue of all
+     their columns are give ground values.
 
-        * exists(Boolean)         do not throw an error if file does not exist and
-                                  Boolean is false. Default is true and an error is
-                                  thrown if the Sqlite file does not exist.
+  * exists(Exists=true)
+     do not throw an error if file does not exist and Exists is false.
 
-        * ext(Ext)                database files are assumed to have an sqlite extension at their end.
-                                  To ovewrite this give Ext ('' for no extension).
+  * ext(Ext=sqlite) 
+     database files are assumed to have an sqlite extension.  
+     To ovewrite this give a different Ext or '' for no extension.
 
-        * verbose(Verb)           Iff Verb==true printa message about which file is used- from within C (false).
-
+  * verbose(Verb=false)
+     Iff Verb==true print messages- currently about file used.
 
 When unary predicates are defined the columns can be interrogated/accessed by list pairs of the form Column=Value.
 Column-Value and Column:Value are also recognised. 
