@@ -305,8 +305,8 @@ sqlite_connect_1(File, Alias, Opts) :-
             ;
             true
         ),
-        % 22.04.30: adding the following 2 commands to get an informative error when file cannot be open for writing (report on github by korvo)
-        open( File, write, TmpStream ),
+        % 22.04.30: adding the following 2 commands to get an informative error when file cannot be open for updating (report on github by korvo)
+        open( File, append, TmpStream ),
         close( TmpStream ),
         c_sqlite_connect(File, Conn),
         asserta( sqlite_connection(Alias,File,Conn) ),
