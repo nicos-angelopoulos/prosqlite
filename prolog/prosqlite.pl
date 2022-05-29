@@ -92,6 +92,7 @@ Thanks to Steve Moyle for contributing safe_column_names/2 (Nov 2016).
 @version 1.4, 2018/3/18  fixed blobs support (see examples/two.pl), and logic for already opened file
 @version 1.6, 2020/5/29  recompiled for SWI 8.2
 @version 1.7, 2022/4/30  print message if new db file cannot be created
+@version 1.8, 2022/5/29  fixed major bug of deleting existing files introduced in 1.7 + minor doc + aarch64-linux binary
 @license    MIT
 @author Nicos Angelopoulos
 @author Sander Canisius
@@ -121,13 +122,13 @@ arity_flag_values( [arity,unary,both,palette] ).
 %
 %==
 % ? sqlite_version(V, D).
-% V = 1:7:0,
-% D = date(2022, 4, 30).
+% V = 1:8:0,
+% D = date(2022, 5, 29).
 %==
 %
 %  @author nicos angelopoulos
 %
-sqlite_version( 1:7:0, date(2022,4,30) ).  
+sqlite_version( 1:8:0, date(2022,5,29) ).  
 
 %% sqlite_binary_version( -Version, -Date ).
 %  The current version of the binaries. If the installed binaries are not compiled from
