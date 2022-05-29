@@ -202,10 +202,6 @@ Options is a sinlge term or a list of terms from the following:
      the module at which the predicates will be asserted at
      (if as_predicates(true)) is also given)
 
-  * table_as(Table,Pname,Arity)
-     map the table to predicate with name Pname. Arity should be
-     defined for this representaition as per arity() option.
-
   * arity(Arity=arity)            
      Arity denotes the arity of access clauses to be added in the prolog database that
      correspond to SQLite tables. The default is =|arity|=, which asserts a 
@@ -233,6 +229,10 @@ Options is a sinlge term or a list of terms from the following:
   * ext(Ext=sqlite) 
      database files are assumed to have an sqlite extension.  
      To ovewrite this give a different Ext or '' for no extension.
+
+  * table_as(Table,Pname,Arity)
+     map the table to predicate with name Pname. Arity should be
+     defined for this representaition as per arity() option.
 
   * verbose(Verb=false)
      Iff Verb==true print messages- currently about file used.
