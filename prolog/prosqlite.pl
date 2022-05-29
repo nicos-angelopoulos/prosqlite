@@ -251,7 +251,7 @@ So for example, for table =|phones|= with columns Name, Address and Phone, prosq
 ==
      phones(_)  
 ==
-if Arity is =|unary|=
+if Arity is =|unary|=.
 
 The latter can be interrogated by 
 
