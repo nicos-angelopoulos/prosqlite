@@ -64,9 +64,11 @@ PL_blob_t PL_SQLite_Connection = {
 
 static foreign_t c_sqlite_connect(term_t filename, term_t connection)
 {
+  int rc;
   char *filename_c;
 
-  if (PL_get_atom_chars(filename, &filename_c))
+  PL_STRINGS_MARK();
+  if ( (rc=PL_get_file_name(filename, &filename_c, PL_FILE_OSPATH)) )
   {
     sqlite_blob_rec *crec;
     sqlite3* handle;
@@ -75,13 +77,15 @@ static foreign_t c_sqlite_connect(term_t filename, term_t connection)
     {
       crec = calloc(1,sizeof(*crec));
       crec->dbh = handle;
-      return PL_unify_blob(connection, crec, sizeof(*crec),
-			   &PL_SQLite_Connection);
+      rc = PL_unify_blob(connection, crec, sizeof(*crec),
+			 &PL_SQLite_Connection);
+    } else {
+      rc = PL_permission_error("open", "sqlite_db", filename);
     }
   }
+  PL_STRINGS_RELEASE();
 
-  PL_free(filename_c);
-  PL_fail;
+  return rc;
 }
 
 
