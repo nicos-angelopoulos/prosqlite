@@ -98,7 +98,7 @@ static foreign_t c_sqlite_disconnect(term_t connection)
    db = conn->dbh;
   {
     if (sqlite3_close_v2(db) == SQLITE_OK)  // 16.08.27, changed from sqlite3_close(db) - Christian
-      { 
+      {
          PL_succeed;
       }  else {
          printf("SQLite returned error at closing database \n");
@@ -165,11 +165,11 @@ int unify_row_term(term_t row, query_context* context)
       break;
 
     case SQLITE_TEXT:
-	 			 if (sqlite3_column_bytes(context->statement,i))
+				 if (sqlite3_column_bytes(context->statement,i))
 					// PL_put_atom_chars(col_term, sqlite3_column_text(context->statement, i));
 					// Samer's fix (1/2)
 					 {   // block this as else below is meant for the outer if
-					 if (!PL_unify_chars(col_term, PL_ATOM | REP_UTF8, -1, sqlite3_column_text(context->statement, i)))
+					   if (!PL_unify_chars(col_term, PL_ATOM | REP_UTF8, (size_t)-1, (char*)sqlite3_column_text(context->statement, i)))
                   return FALSE;
 					 }
 				else
@@ -182,10 +182,10 @@ int unify_row_term(term_t row, query_context* context)
     case SQLITE_BLOB:
       // TODO: what prolog type should BLOBs be mapped to?
       // PL_put_blob?
-		// for now map to string, as you can later can access the bytes 
+		// for now map to string, as you can later can access the bytes
 		// Samer's fix 2/2:
 	if (sqlite3_column_bytes(context->statement,i)) {
-    if (!PL_unify_chars(col_term, PL_STRING | REP_UTF8, -1, sqlite3_column_text(context->statement, i))) return FALSE;
+	  if (!PL_unify_chars(col_term, PL_STRING | REP_UTF8, (size_t)-1, (char*)sqlite3_column_text(context->statement, i))) return FALSE;
       } else {
     if (!PL_put_string_chars(col_term, "")) return FALSE;
 		}
@@ -197,7 +197,7 @@ int unify_row_term(term_t row, query_context* context)
 		 if (sqlite3_column_bytes(context->statement,i))
 					// this should probably never be the case (should be SQLITE_TEXT?) but firefox's places.sqlite
 					// has non 0 length nulls
-					PL_put_atom_chars(col_term, sqlite3_column_text(context->statement, i));
+					PL_put_atom_chars(col_term, (char*)sqlite3_column_text(context->statement, i));
 				else
 					// PL_put_nil(col_term)  // would be more correct probably
 					PL_put_atom_chars(col_term, "" );
@@ -216,7 +216,7 @@ static foreign_t c_sqlite_version(term_t ver, term_t datem)
 {
     term_t tmp = PL_new_term_ref();
 	 // 1:0:0,  date(2014,12,23)
-    if ( PL_unify_term(tmp,PL_FUNCTOR_CHARS,":",2,PL_INT, 3, PL_INT, 0) &&    // Minor + Fix 
+    if ( PL_unify_term(tmp,PL_FUNCTOR_CHARS,":",2,PL_INT, 3, PL_INT, 0) &&    // Minor + Fix
          PL_unify_term(ver,PL_FUNCTOR_CHARS,":",2,PL_INT, 1, PL_TERM, tmp ) &&   // Major
          PL_unify_term(datem,PL_FUNCTOR_CHARS,"date",3,PL_INT, 2018, PL_INT, 3, PL_INT, 17) )
          // 1:1:0, 2016,10,9
@@ -226,7 +226,7 @@ static foreign_t c_sqlite_version(term_t ver, term_t datem)
       return FALSE;
 
     return FALSE;
-    // PL_unify_term(ver,PL_FUNCTOR_CHARS,":",1,PL_CHARS, 
+    // PL_unify_term(ver,PL_FUNCTOR_CHARS,":",1,PL_CHARS,
 }
 
 int raise_sqlite_exception(sqlite3* db)
@@ -286,7 +286,7 @@ int get_query_string(term_t tquery, char** query)
 
 
 // Jan says "You must call PL_free() on the query strings after you are done with them!"
-// fixme: check here or at Prolog that Connection/Alias IS open: otherwise 
+// fixme: check here or at Prolog that Connection/Alias IS open: otherwise
 //                        we get sqlite_error(21,library routine called out of sequence)
 static foreign_t c_sqlite_query(term_t connection, term_t query, term_t row,
 				 control_t handle)
@@ -311,7 +311,7 @@ static foreign_t c_sqlite_query(term_t connection, term_t query, term_t row,
     char* query_c;
     sqlite3_stmt* statement;
     if (!get_query_string(query, &query_c))
-      { 
+      {
          PL_free(query_c);
          PL_fail;
       };
@@ -333,7 +333,7 @@ static foreign_t c_sqlite_query(term_t connection, term_t query, term_t row,
 	PL_retry_address(context);
       /*FALLTHROUGH*/
     case SQLITE_DONE:
-       if (recurrent) 
+       if (recurrent)
          {
             free_query_context(context);
             PL_fail;
@@ -359,7 +359,7 @@ static foreign_t c_sqlite_query(term_t connection, term_t query, term_t row,
     }
 
   case PL_REDO:
-    
+
     context = PL_foreign_context_address(handle);
     switch (sqlite3_step(context->statement))
     {

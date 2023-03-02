@@ -1,5 +1,5 @@
 SOBJ=	$(PACKSODIR)/prosqlite.$(SOEXT)
-CFLAGS+=-std=c99
+CFLAGS+=-std=c99 -Wall
 LIBS=	-lsqlite3
 
 all:	$(SOBJ)
