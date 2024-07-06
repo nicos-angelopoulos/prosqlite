@@ -2,6 +2,7 @@
 --------------------
 
 1.9
+     24.07.06   FIXED: changed load_foreign_library() to use_foreign_library(), thanks to JBThiel
      23.03.11   FIXED: connect may free uninitialized memory.   Using PL_get_file_name(). (fixes by Jan Wielemaker)
                 CLEANUP: Allow using `-Wall` compiler checks.
 

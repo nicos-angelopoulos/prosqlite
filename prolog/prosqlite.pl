@@ -26,7 +26,7 @@
 :- at_halt( sqlite_disconnect ).
 
 :- use_module(library(shlib)).
-:- load_foreign_library(foreign(prosqlite)).
+:- use_foreign_library(foreign(prosqlite)).
 
 :- dynamic(sqlite_connection/3).
 :- dynamic(sqlite_db:sqlite_asserted/4).
