@@ -3,6 +3,7 @@
 
 1.9
      24.07.07   IFACE: added option abolish_pred(Abol), in sqlite_disconnect/2 which when false does not abolish predicated tables (only retractalls)
+                ERROR: enhance handling SQLite errors in c-code (github issue 3)
      24.07.06   FIXED: changed load_foreign_library() to use_foreign_library(), thanks to JBThiel
                 FIXED: predicated ?- mytable(A,B,groupaa). where the 3rd column name is a keyword such as "group". Reported by JBThiel
      23.03.11   FIXED: connect may free uninitialized memory.   Using PL_get_file_name(). (fixes by Jan Wielemaker)

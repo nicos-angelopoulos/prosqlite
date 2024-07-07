@@ -722,8 +722,11 @@ sqlite_fail( Type, Term ) :-
 
 prolog:message(sqlite(Message)) -->
     message(Message).
+prolog:message(sqlite_error(Code,Message)) -->
+    message(sqlite_error(Code,Message)).
 
-
+message( sqlite_error(Code,Mess) ) -->
+     ['SQLite code: ~d, with short message: ~w' - [Code,Mess] ].
 message( pair_representation(Term) ) -->
      ['Wrong term type ~q in predicated table arguments. Expected binary with functor, {=,:,-}.' - [Term] ].
 message( unknown_column(Clm,Columns) ) -->

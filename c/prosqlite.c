@@ -241,7 +241,6 @@ int raise_sqlite_exception(sqlite3* db)
   return FALSE;
 }
 
-
 // Copied and adapted from the odbc package
 int formatted_string(term_t in, char** out)
 {
@@ -356,6 +355,8 @@ static foreign_t c_sqlite_query(term_t connection, term_t query, term_t row,
                PL_succeed;
             };
          }
+     default:
+     return raise_sqlite_exception(db);
     }
 
   case PL_REDO:
