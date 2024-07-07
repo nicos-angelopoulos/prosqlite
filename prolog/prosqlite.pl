@@ -126,9 +126,9 @@ arity_flag_values( [arity,unary,both,palette] ).
 % D = date(2022, 5, 29).
 %==
 %
-%  @author nicos angelopoulos
+% @author nicos angelopoulos
 %
-sqlite_version( 1:8:0, date(2022,5,29) ).  
+sqlite_version(1:8:2, date(2024,7,6)).
 
 %% sqlite_binary_version( -Version, -Date ).
 %  The current version of the binaries. If the installed binaries are not compiled from
@@ -471,10 +471,10 @@ sqlite_pragma_info_facet( row(_,_,_,_,_,Key), primary_key(Key) ).
 sqlite_pragma( Alias, Pragma-Par, Row ) :-
      !,
      atomic_list_concat( ['PRAGMA',Pragma,'(~w)'],' ', Query ), 
-    sqlite_format_query( Alias, Query-Par, Row ).
+     sqlite_format_query( Alias, Query-Par, Row ).
 sqlite_pragma( Alias, Pragma, Row ) :-
      atomic_list_concat( ['PRAGMA',Pragma],' ', Query ), 
-    sqlite_query( Alias, Query, Row ).
+     sqlite_query( Alias, Query, Row ).
 
 % pragmas_info( [...,encoding,...,secure_delete,synchronous,temp_store,writable_schema] ).
 pragmas_comm( [shrink_memory] ).
@@ -584,7 +584,7 @@ sqlite_establish_table_typed( Table, Pname, Columns, Conn, Mod, ArityF, Arity ) 
 sqlite_holds( AliasOr, Name, _Arity, Type, Columns, Args ) :-
      sqlite_alias_connection( AliasOr, Conn ),
      pl_as_predicate_to_sql_ready_data( Type, Columns, Args, KnwnClmPrs, UnKnwnCs, UnKnwnAs ),
-    safe_column_names(Columns, SafeColumns),
+     safe_column_names(Columns, SafeColumns),
      safe_column_names(UnKnwnCs, SafeUnKnwnCs),
      sqlite_holds_unknown( SafeUnKnwnCs, UnKnwnAs, KnwnClmPrs, Name, SafeColumns, Conn ).
 
@@ -782,7 +782,7 @@ sql_clm_and_val_to_sql_equals_atom(K, V, KVAtm) :-
           atom_concat(V, '\'', VDsh),
           atom_concat('=\'',VDsh,EqV)
      ),
-     atom_concat(K, EqV, KVAtm).
+     atomic_list_concat( ['[',K,']',EqV], '', KVAtm ).
 
 sqlite_facet_table( arity(Arity), Connection, Table ) :-
      findall( Column, sqlite_table_column(Connection, Table, Column), Columns ),
