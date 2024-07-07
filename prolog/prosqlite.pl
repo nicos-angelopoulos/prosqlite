@@ -376,7 +376,8 @@ sqlite_disconnect( Alias, _ ) :-
 
 sqlite_clean_up_predicated_for( false, Conn, pam(Pname,Arity,Mod) ) :-
      functor( Head, Pname, Arity ),
-     retractall( Mod:Head ).
+     retractall( Mod:Head ),
+     retractall( sqlite_db:sqlite_asserted(Conn,Pname,Arity,Mod) ).
 sqlite_clean_up_predicated_for( true, Conn, pam(Pname,Arity,Mod) ) :-
      abolish( Mod:Pname, Arity ),
      retractall( sqlite_db:sqlite_asserted(Conn,Pname,Arity,Mod) ).
