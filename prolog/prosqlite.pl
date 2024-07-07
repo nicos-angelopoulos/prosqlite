@@ -346,9 +346,14 @@ sqlite_disconnect.
 %   set to =|false|= to only retract predicated definitions, by default these are abolished
 %
 % 
+%Examples
 %==
 %    ?- 
 %         sqlite_disconnect(uniprot).
+%
+%
+%    ?- 
+%         sqlite_disconnect(uniprot, abolish_pred(false)).
 %==
 %
 %@version 0:2, 2024/07/07
