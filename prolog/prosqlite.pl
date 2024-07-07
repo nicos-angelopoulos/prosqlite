@@ -2,6 +2,7 @@
           [ sqlite_connect/2,           % +FileName, -Conn
             sqlite_connect/3,           % +FileName, -Conn, +Opts
             sqlite_disconnect/1,        % +Conn
+            sqlite_disconnect/2,        % +Conn, +Opts
             sqlite_current_connection/1,% -Conn
             sqlite_query/2,             % +SQL, -Row
             sqlite_query/3,             % +Conn, +SQL, -Row
@@ -190,8 +191,8 @@ sqlite_connect(File, Conn) :-
 Open a connection to an sqlite File. If Connection is unbound then if (a)  alias(Alias) option is given, 
 Connection is bound to Alias, else (b) an opaque atom is generated. If Connection is ground, 
 the opened can be accessed with Connection as a handle.
-Options is a sinlge term or a list of terms from the following:
 
+Options is a single term or a list of terms from the following:
   * alias(Atom)
      identify the connection as Alias (no default, interplays with Connection)
 
@@ -331,33 +332,43 @@ sqlite_connect(File, Conn, Opts) :-
 % 
 sqlite_disconnect :-
      sqlite_connection(Alias,_,_),
-     sqlite_disconnect( Alias ),
+     sqlite_disconnect( Alias, [] ),
      fail.
 sqlite_disconnect.
      
-%% sqlite_disconnect( +Alias ).
+%% sqlite_disconnect(+Alias).
+%% sqlite_disconnect(+Alias, +Options).
 %
-%  Terminate the connection to a SQLite database file.
+%  Terminate the connection to an SQLite database file.
 %
+% Options is a single term or a list of terms from the following:
+% * abolish_pred(Abl=true)
+%   set to =|false|= to only retract predicated definitions, by default these are abolished
+% 
 %  ==
 %    sqlite_disconnect(uniprot).
 %  ==
 %
 sqlite_disconnect( Alias ) :-
+     sqlite_disconnect( Alias, [] ).
+
+sqlite_disconnect( Alias, OptIn ) :-
      once( sqlite_connection(Alias,_,Conn) ),
      !,
      debug( sqlite, 'Disconnecting from db with alias: ~w.', [Alias] ),
      c_sqlite_disconnect( Conn ),
      retractall( sqlite_connection(Alias,_,Conn) ),
      findall( pam(Pname,Arity,Mod), sqlite_db:sqlite_asserted(Conn,Pname,Arity,Mod), PAs ),
-     maplist( sqlite_clean_up_predicated_for(Conn), PAs ).
-
-sqlite_disconnect( Alias ) :-
+     to_list( OptIn, Opts ),
+     ( memberchk(abolish_pred(false),Opts) -> Abo = false; Abo = true ),
+     maplist( sqlite_clean_up_predicated_for(Abo,Conn), PAs ).
+sqlite_disconnect( Alias, _ ) :-
      sqlite_fail( not_a_connection(Alias) ).
 
-sqlite_clean_up_predicated_for( Conn, pam(Pname,Arity,Mod) ) :-
-     % functor( Head, Pname, Arity ),
-     % retractall( Mod:Head ),
+sqlite_clean_up_predicated_for( false, Conn, pam(Pname,Arity,Mod) ) :-
+     functor( Head, Pname, Arity ),
+     retractall( Mod:Head ).
+sqlite_clean_up_predicated_for( true, Conn, pam(Pname,Arity,Mod) ) :-
      abolish( Mod:Pname, Arity ),
      retractall( sqlite_db:sqlite_asserted(Conn,Pname,Arity,Mod) ).
 
