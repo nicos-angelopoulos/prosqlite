@@ -344,11 +344,15 @@ sqlite_disconnect.
 % Options is a single term or a list of terms from the following:
 % * abolish_pred(Abl=true)
 %   set to =|false|= to only retract predicated definitions, by default these are abolished
-% 
-%  ==
-%    sqlite_disconnect(uniprot).
-%  ==
 %
+% 
+% ==
+%    ?- 
+%         sqlite_disconnect(uniprot).
+% ==
+%
+% @verion 0:2, 2024/07/07
+% 
 sqlite_disconnect( Alias ) :-
      sqlite_disconnect( Alias, [] ).
 
