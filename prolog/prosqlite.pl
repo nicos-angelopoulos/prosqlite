@@ -65,6 +65,28 @@ For instance test by :
      ?- predicated.
 ==
 
+As of v2.0 errors and null values are better supported:
+==
+% assuming db is open in SQLiteBrowser, with unsaved changes:
+
+?- sqlite_query(db1, "update ex_t set exid=99 where exf3='v13';", AffC ).
+
+ERROR: Unhandled exception: SQLite code: 5, with short message: database is locked
+
+
+?- ex_t(A,B,C), write(A:B:C), nl, fail.
+1:v12:v13
+2: : $null$
+3: $null$ : w
+false.
+
+?- ex_t(A,B,'$null$')
+|    .
+exf3- $null$
+A = 2,
+B = '' ;
+==
+
 There is a sister package, db_facts (also installable via the manager).
 Db_facts, allow interaction with the underlying database via Prolog terms,
 That library can also be used as a common compatibility layer for the ODBC
@@ -86,6 +108,9 @@ _v2 is designed for garbage collected languages, see http://sqlite.org/c3ref/clo
 Thanks to Wolfram Diestel for spotting a bug in opening 2 dbs with distinct aliases.
 
 Thanks to Steve Moyle for contributing safe_column_names/2 (Nov 2016).
+
+Thanks to JBThiel for opening a number of issues that when addressed 
+led to publication of v2.0.
 
 @version 1.0, 2014/12/24
 @version 1.1, 2016/10/9  changed to sqlite3_close() and fixed alias bug
@@ -799,14 +824,20 @@ sql_clm_value_pairs_to_where_conjunction([K-V|T], Where) :-
      ).
 
 sql_clm_and_val_to_sql_equals_atom(K, V, KVAtm) :-
+     write( K-V ), nl,
      ( number(V) -> 
           atom_number(Vatm, V),
-          atom_concat('=',Vatm,EqV)
+          atom_concat('=',Vatm,EqV),
+          atomic_list_concat( ['[',K,']',EqV], '', KVAtm )
           ;
-          atom_concat(V, '\'', VDsh),
-          atom_concat('=\'',VDsh,EqV)
-     ),
-     atomic_list_concat( ['[',K,']',EqV], '', KVAtm ).
+          ( V == '$null$' ->
+               atom_concat( K, ' IS NULL', KVAtm )
+               ;
+               atom_concat(V, '\'', VDsh),
+               atom_concat('=\'',VDsh,EqV),
+               atomic_list_concat( ['[',K,']',EqV], '', KVAtm )
+          )
+     ).
 
 sqlite_facet_table( arity(Arity), Connection, Table ) :-
      findall( Column, sqlite_table_column(Connection, Table, Column), Columns ),

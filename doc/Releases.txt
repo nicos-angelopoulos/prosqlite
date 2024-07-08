@@ -2,6 +2,7 @@
 --------------------
 
 1.9
+     24.07.08   IFACE: better support for null values. Reported by JBThiel, github issue 4
      24.07.07   IFACE: added option abolish_pred(Abol), in sqlite_disconnect/2 which when false does not abolish predicated tables (only retractalls)
                 ERROR: enhance handling SQLite errors in c-code (github issue 3)
      24.07.06   FIXED: changed load_foreign_library() to use_foreign_library(), thanks to JBThiel

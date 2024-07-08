@@ -142,16 +142,26 @@ void free_query_context(query_context* context)
   free(context);
 }
 
-
 int unify_row_term(term_t row, query_context* context)
 {
   if (!PL_unify_functor(row, context->row_functor))
     PL_fail;
 
+    // printf("text: %d \n", SQLITE_TEXT);
+    // printf("null: %d \n", SQLITE_NULL);
+
   for (int i = 0; i < context->num_columns; i++)
   {
     term_t col_term = PL_new_term_ref();
 
+    if ( sqlite3_column_type(context->statement,i) == SQLITE_NULL)
+      {
+			if (!PL_put_atom_chars(col_term, "$null$" ))
+         return FALSE;
+         // fixme: what happens at else ? 
+      }
+      else
+      {
     switch (context->column_types[i])
     {
     case SQLITE_INTEGER:
@@ -164,6 +174,7 @@ int unify_row_term(term_t row, query_context* context)
 	return FALSE;
       break;
 
+
     case SQLITE_TEXT:
 				 if (sqlite3_column_bytes(context->statement,i))
 					// PL_put_atom_chars(col_term, sqlite3_column_text(context->statement, i));
@@ -175,7 +186,9 @@ int unify_row_term(term_t row, query_context* context)
 				else
 					// this should probably never be the case (should be SQLITE_NULL) but firefox's places.sqlite
 					// has 0 length texts
-					PL_put_atom_chars(col_term, "" );
+                  {
+					   PL_put_atom_chars(col_term, "" );
+               }
 
       break;
 
@@ -200,10 +213,11 @@ int unify_row_term(term_t row, query_context* context)
 					PL_put_atom_chars(col_term, (char*)sqlite3_column_text(context->statement, i));
 				else
 					// PL_put_nil(col_term)  // would be more correct probably
-					PL_put_atom_chars(col_term, "" );
-
+					PL_put_atom_chars(col_term, "$null$" );
       break;
+
     }
+   }
 
     if (!PL_unify_arg(i + 1, row, col_term))
       PL_fail;
