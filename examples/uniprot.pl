@@ -24,8 +24,8 @@ The output should look like:
 Running on :date(2012,10,17)
 Using database at: uniprot.sqlite
 
-table:secondary_accessions
-table:identifier_mapping
+t_name:secondary_accessions
+t_name:identifier_mapping
 
 secondary_accessions/secondary_accession
 secondary_accessions/primary_accession
@@ -120,7 +120,7 @@ uniprot :-
 
 show_tables :-
      sqlite_current_table( uniprot, Table ),
-     write( table:Table ), nl, 
+     write( t_name:Table ), nl, 
      fail.
 show_tables :-
      nl.
