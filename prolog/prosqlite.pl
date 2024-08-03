@@ -120,7 +120,7 @@ led to publication of v2.0.
 @version 1.6, 2020/5/29  recompiled for SWI 8.2
 @version 1.7, 2022/4/30  print message if new db file cannot be created
 @version 1.8, 2022/5/29  fixed major bug of deleting existing files introduced in 1.7 + minor doc + aarch64-linux binary
-@version 2.0  2024/?/?   better error propagaion & nulls, keywords as fields, library_version
+@version 2.0  2024/?/?   better error propagation & nulls, keywords as fields, library_version, disconnect remove_predicates option
 @license    MIT
 @author Nicos Angelopoulos
 @author Sander Canisius
@@ -410,28 +410,65 @@ sqlite_disconnect :-
      fail.
 sqlite_disconnect.
      
-%% sqlite_disconnect(+Alias).
-%% sqlite_disconnect(+Alias, +Options).
-%
-%  Terminate the connection to an SQLite database file.
-%
-% Options is a single term or a list of terms from the following:
-% * abolish_pred(Abl=true)
-%   set to =|false|= to only retract predicated definitions, by default these are abolished
-%
-% 
-%Examples
-%==
-%    ?- 
-%         sqlite_disconnect(uniprot).
-%
-%
-%    ?- 
-%         sqlite_disconnect(uniprot, abolish_pred(false)).
-%==
-%
-%@version 0:2, 2024/07/07
-% 
+/**  sqlite_disconnect(+Alias).
+     sqlite_disconnect(+Alias, +Options).
+
+Terminate the connection to an SQLite database file.
+
+Options is a single term or a list of terms from the following:
+  * remove_predicates(Rmv=abolish)
+     defines the method of removing predicates that are defined on tabels of connection Alias.
+     (That is, that =|as_predicates(true)|+ was used when created Alias connection.)
+     Set to =|retractall|= to only retract predicated definitions, 
+     by default these are abolished. prolog_flag/2 key sqlite_remove_predicates takes precedence.
+
+
+Examples
+==
+   ?- 
+        sqlite_disconnect(uniprot).
+
+?- sqlite_connect( kword, kwordo, as_predicates(true) ).
+true.
+
+?- kwordo(A,B,C).
+A = 1,
+B = f11,
+C = f21 ;
+A = 2,
+B = f12,
+C = groupaa ;
+false.
+
+?- sqlite_disconnect( kwordo ).
+true.
+
+?- kwordo(A,B,C).
+ERROR: Unknown procedure: kwordo/3 (DWIM could not correct goal)
+?- sqlite_connect( kword, kwordo, as_predicates(true) ).
+true.
+
+?- kwordo(A,B,C).
+A = 1,
+B = f11,
+C = f21 ;
+A = 2,
+B = f12,
+C = groupaa ;
+false.
+
+?- sqlite_disconnect( kwordo, remove_predicates(retractall) ).
+true.
+
+?- kwordo(A,B,C).
+false.
+
+==
+
+@author nicos angelopoulos
+@version  0:2 2024/08/03
+
+*/ 
 sqlite_disconnect( Alias ) :-
      sqlite_disconnect( Alias, [] ).
 
@@ -439,20 +476,35 @@ sqlite_disconnect( Alias, OptIn ) :-
      once( sqlite_connection(Alias,_,Conn) ),
      !,
      debug( sqlite, 'Disconnecting from db with alias: ~w.', [Alias] ),
+     findall( pam(Pname,Arity,Mod), sqlite_db:sqlite_asserted(Conn,Pname,Arity,Mod), PAs ),
      c_sqlite_disconnect( Conn ),
      retractall( sqlite_connection(Alias,_,Conn) ),
-     findall( pam(Pname,Arity,Mod), sqlite_db:sqlite_asserted(Conn,Pname,Arity,Mod), PAs ),
      to_list( OptIn, Opts ),
-     ( memberchk(abolish_pred(false),Opts) -> Abo = false; Abo = true ),
+     sqlite_disconnect_predicates( Opts, Abo ),
      maplist( sqlite_clean_up_predicated_for(Abo,Conn), PAs ).
 sqlite_disconnect( Alias, _ ) :-
      sqlite_fail( not_a_connection(Alias) ).
 
-sqlite_clean_up_predicated_for( false, Conn, pam(Pname,Arity,Mod) ) :-
+sqlite_disconnect_predicates( _Opts, Rmv ) :-
+     current_prolog_flag( sqlite_remove_predicates, Rmv ),
+     !.
+sqlite_disconnect_predicates( Opts, Rmv ) :-
+     memberchk( remove_predicates(Rmv), Opts ),
+     !.
+sqlite_disconnect_predicates( _Opts, Rmv ) :-
+     Rmv = abolish.
+
+sqlite_clean_up_predicated_for( Abo, Conn, Pam ) :-
+     sqlite_clean_up_predicated_for_known( Abo, Conn, Pam ),
+     !.
+sqlite_clean_up_predicated_for( Abo, _Conn, _Pam ) :-
+     throw( unknown_value(remove_predicates,Abo) ).
+
+sqlite_clean_up_predicated_for_known( retractall, Conn, pam(Pname,Arity,Mod) ) :-
      functor( Head, Pname, Arity ),
      retractall( Mod:Head ),
      retractall( sqlite_db:sqlite_asserted(Conn,Pname,Arity,Mod) ).
-sqlite_clean_up_predicated_for( true, Conn, pam(Pname,Arity,Mod) ) :-
+sqlite_clean_up_predicated_for_known( abolish, Conn, pam(Pname,Arity,Mod) ) :-
      abolish( Mod:Pname, Arity ),
      retractall( sqlite_db:sqlite_asserted(Conn,Pname,Arity,Mod) ).
 
