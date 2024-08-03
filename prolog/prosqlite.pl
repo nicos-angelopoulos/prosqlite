@@ -17,7 +17,7 @@
             sqlite_pragma/3,            % ?Date, ?SqlAtom
             sqlite_version/2,           % -Version, -Date
             sqlite_binary_version/2,    % -Version, -Date
-            sqlite_lib_version/1,       % -Version
+            sqlite_library_version/1,   % -Version
             sqlite_citation/2           % -Atom, Bibterm
           ] ).
 
@@ -120,7 +120,7 @@ led to publication of v2.0.
 @version 1.6, 2020/5/29  recompiled for SWI 8.2
 @version 1.7, 2022/4/30  print message if new db file cannot be created
 @version 1.8, 2022/5/29  fixed major bug of deleting existing files introduced in 1.7 + minor doc + aarch64-linux binary
-@version 2.0  2024/?/?   better error propagaion & nulls, keywords as fields, lib_version
+@version 2.0  2024/?/?   better error propagaion & nulls, keywords as fields, library_version
 @license    MIT
 @author Nicos Angelopoulos
 @author Sander Canisius
@@ -158,15 +158,26 @@ arity_flag_values( [arity,unary,both,palette] ).
 %
 sqlite_version(1:8:2, date(2024,7,6)).
 
-%% sqlite_binary_version( -Version, -Date ).
-%  The current version of the binaries. If the installed binaries are not compiled from
-%  the sources, then this might be different (=older) that the sqlite Porlog source version
-%  returned by sqlite_version/2. Version is a Mj:Mn:Fx term, and date is a date(Y,M,D) term.
-%
+/** sqlite_binary_version( -Version, -Date ).
+
+   The current version and date of publication of the proSQLite c-code. 
+
+   This is provided as the c code is not changed as often as the prolog part of the pack.
+
+==
+?- 
+
+?-
+==
+
+@author nicos angelopoulos
+@version  0:2 24.08.03
+
+*/
 sqlite_binary_version( Ver, Date ) :-
      c_sqlite_version( Ver, Date ).
 
-/** sqlite_lib_version(-Lersion).
+/** sqlite_library_version(-Lersion).
 
 Get the version of the underlying sqlite library.
 
@@ -174,12 +185,12 @@ This version uses the query interface so it expects a default connection to have
 This can also be implemented via C:sqlite3_libversion(). 
 
 ==
-?- sqlite_lib_version(V). 
+?- sqlite_library_version(V). 
 false.
 
 ?- sqlite_connect('/tmp/testo.sqlite', testo, exists(false)).
 
-?- sqlite_lib_version(V).
+?- sqlite_library_version(V).
 V = 3:37:2.
 ==
 
@@ -187,7 +198,7 @@ V = 3:37:2.
 @version 0.1, 2024/8/3
 
 */
-sqlite_lib_version( V ) :-
+sqlite_library_version( V ) :-
      sqlite_query( 'SELECT sqlite_version()', Row ),
      Row = row(Atm),
      atomic_list_concat([Mj,Mn,Fx],'.',Atm),
