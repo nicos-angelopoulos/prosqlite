@@ -160,14 +160,19 @@ sqlite_version(1:8:2, date(2024,7,6)).
 
 /** sqlite_binary_version( -Version, -Date ).
 
-   The current version and date of publication of the proSQLite c-code. 
+   The current version and date of publication for the proSQLite c-code. 
 
    This is provided as the c code is not changed as often as the prolog part of the pack.
+   These changes require re-compiling the binaries of the pack distribution.
 
 ==
-?- 
+?- sqlite_binary_version(V,D).
+V = 1:3:0,
+D = date(2018, 3, 17).
 
-?-
+?- sqlite_version(V1,D1).
+V1 = 1:8:2,
+D1 = date(2024, 7, 6).
 ==
 
 @author nicos angelopoulos
