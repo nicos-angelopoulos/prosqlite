@@ -878,7 +878,7 @@ sql_clm_and_val_to_sql_equals_atom(K, V, KVAtm) :-
           atomic_list_concat( ['[',K,']',EqV], '', KVAtm )
           ;
           ( V == '$null$' ->
-               atom_concat( K, ' IS NULL', KVAtm )
+               atomic_list_concat( '[',K,'] IS NULL', KVAtm )
                ;
                atom_concat(V, '\'', VDsh),
                atom_concat('=\'',VDsh,EqV),
