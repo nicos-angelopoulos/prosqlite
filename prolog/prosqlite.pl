@@ -156,7 +156,7 @@ arity_flag_values( [arity,unary,both,palette] ).
 %
 % @author nicos angelopoulos
 %
-sqlite_version(1:8:2, date(2024,7,6)).
+sqlite_version(1:8:3, date(2024,8,3)).
 
 /** sqlite_binary_version( -Version, -Date ).
 
