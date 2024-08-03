@@ -110,7 +110,7 @@ Thanks to Wolfram Diestel for spotting a bug in opening 2 dbs with distinct alia
 
 Thanks to Steve Moyle for contributing safe_column_names/2 (Nov 2016).
 
-Thanks to JBThiel for opening a number of issues that when addressed 
+Thanks to John B Thiel (JBThiel) for opening a number of issues that when addressed 
 led to publication of v2.0.
 
 @version 1.0, 2014/12/24
@@ -120,6 +120,7 @@ led to publication of v2.0.
 @version 1.6, 2020/5/29  recompiled for SWI 8.2
 @version 1.7, 2022/4/30  print message if new db file cannot be created
 @version 1.8, 2022/5/29  fixed major bug of deleting existing files introduced in 1.7 + minor doc + aarch64-linux binary
+@version 2.0  2024/?/?   better error propagaion & nulls, keywords as fields, lib_version
 @license    MIT
 @author Nicos Angelopoulos
 @author Sander Canisius
