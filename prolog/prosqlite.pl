@@ -23,9 +23,9 @@
 
 :- use_module(library(lists)).  % append/3, member/2, memberchk/2.
 :- use_module(library(apply)).  % maplist/2,3.
-:- use_module( library(debug) ).
+:- use_module(library(debug)).
 
-:- at_halt( sqlite_disconnect ).
+:- at_halt(sqlite_disconnect).
 
 :- use_module(library(shlib)).
 :- use_foreign_library(foreign(prosqlite)).
@@ -417,10 +417,10 @@ Terminate the connection to an SQLite database file.
 
 Options is a single term or a list of terms from the following:
   * remove_predicates(Rmv=abolish)
-     defines the method of removing predicates that are defined on tabels of connection Alias.
+     defines the method of removing predicates that are defined on tables of connection Alias.
      (That is, that =|as_predicates(true)|+ was used when created Alias connection.)
-     Set to =|retractall|= to only retract predicated definitions, 
-     by default these are abolished. prolog_flag/2 key sqlite_remove_predicates takes precedence.
+     Set to =|retractall|= to only retract predicated definitions, by default these are abolished. 
+     prolog_flag/2 key sqlite_remove_predicates can set a new default value.
 
 
 Examples
@@ -485,11 +485,11 @@ sqlite_disconnect( Alias, OptIn ) :-
 sqlite_disconnect( Alias, _ ) :-
      sqlite_fail( not_a_connection(Alias) ).
 
-sqlite_disconnect_predicates( _Opts, Rmv ) :-
-     current_prolog_flag( sqlite_remove_predicates, Rmv ),
-     !.
 sqlite_disconnect_predicates( Opts, Rmv ) :-
      memberchk( remove_predicates(Rmv), Opts ),
+     !.
+sqlite_disconnect_predicates( _Opts, Rmv ) :-
+     current_prolog_flag( sqlite_remove_predicates, Rmv ),
      !.
 sqlite_disconnect_predicates( _Opts, Rmv ) :-
      Rmv = abolish.
