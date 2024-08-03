@@ -17,6 +17,7 @@
             sqlite_pragma/3,            % ?Date, ?SqlAtom
             sqlite_version/2,           % -Version, -Date
             sqlite_binary_version/2,    % -Version, -Date
+            sqlite_lib_version/1,       % -Version
             sqlite_citation/2           % -Atom, Bibterm
           ] ).
 
@@ -163,6 +164,36 @@ sqlite_version(1:8:2, date(2024,7,6)).
 %
 sqlite_binary_version( Ver, Date ) :-
      c_sqlite_version( Ver, Date ).
+
+/** sqlite_lib_version(-Lersion).
+
+Get the version of the underlying sqlite library.
+
+This version uses the query interface so it expects a default connection to have been established. 
+This can also be implemented via C:sqlite3_libversion(). 
+
+==
+?- sqlite_lib_version(V). 
+false.
+
+?- sqlite_connect('/tmp/testo.sqlite', testo, exists(false)).
+
+?- sqlite_lib_version(V).
+V = 3:37:2.
+==
+
+@author  nicos angelopoulos
+@version 0.1, 2024/8/3
+
+*/
+sqlite_lib_version( V ) :-
+     sqlite_query( 'SELECT sqlite_version()', Row ),
+     Row = row(Atm),
+     atomic_list_concat([Mj,Mn,Fx],'.',Atm),
+     maplist( atom_number, [Mj,Mn,Fx], [Nj,Nn,Nx] ),
+     V = Nj:Nn:Nx,
+     !.
+     
 
 %% sqlite_citation( -Atom, -Bibterm ).
 % Succeeds once for each publication related to this library. Atom is the atom representation
