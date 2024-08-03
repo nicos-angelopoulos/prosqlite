@@ -271,7 +271,8 @@ Options is a single term or a list of terms from the following:
 
   * as_predicates(AsPred=false)
      if true, create hook predicates that map each sqlite table to a prolog predicate.
-     These are created in module user (see at_module()). The user should make sure the predicate is not previously defined.
+     These are created in module user (see at_module()). 
+     The user should make sure the predicate is not previously defined.
 
   * at_module(AtMod=user)
      the module at which the predicates will be asserted at
