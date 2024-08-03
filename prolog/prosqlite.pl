@@ -872,7 +872,6 @@ sql_clm_value_pairs_to_where_conjunction([K-V|T], Where) :-
      ).
 
 sql_clm_and_val_to_sql_equals_atom(K, V, KVAtm) :-
-     write( K-V ), nl,
      ( number(V) -> 
           atom_number(Vatm, V),
           atom_concat('=',Vatm,EqV),
