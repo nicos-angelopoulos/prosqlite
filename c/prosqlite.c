@@ -254,6 +254,15 @@ static foreign_t c_library_version(term_t ver)
     // PL_unify_term(ver,PL_FUNCTOR_CHARS,":",1,PL_CHARS,
 }
 
+static foreign_t c_build_version(term_t ver)
+{
+      if ( PL_unify_term(ver,PL_CHARS,SQLITE_VERSION) )
+      return TRUE;
+      else
+      return FALSE;
+    return FALSE;
+}
+
 int raise_sqlite_exception(sqlite3* db)
 {
   term_t except = PL_new_term_ref();
@@ -418,6 +427,7 @@ install_t install_prosqlite()
   minus2_functor = PL_new_functor(PL_new_atom("-"), 2);
   PL_register_foreign("c_sqlite_version", 2, c_sqlite_version, 0);
   PL_register_foreign("c_library_version", 1, c_library_version, 0);
+  PL_register_foreign("c_build_version", 1, c_build_version, 0);
   PL_register_foreign("c_sqlite_connect", 2, c_sqlite_connect, 0);
   PL_register_foreign("c_sqlite_disconnect", 1, c_sqlite_disconnect, 0);
   PL_register_foreign("c_sqlite_query", 3, c_sqlite_query,

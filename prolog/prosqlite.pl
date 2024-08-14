@@ -20,6 +20,7 @@
             sqlite_library_version/1,   % -Version
             sqlite_library_version/2,   % +Alias, -Version
             sqlite_library_c_version/1, % -Version
+            sqlite_build_version/1,     % -Version
             sqlite_citation/2           % -Atom, Bibterm
           ] ).
 
@@ -184,7 +185,7 @@ D1 = date(2024, 7, 6).
 sqlite_binary_version( Ver, Date ) :-
      c_sqlite_version( Ver, Date ).
 
-/** sqlite_library_version(-LibVers).
+/** sqlite_library_c_version(-LibCVers).
 
 Get the vesion of the SQLite version via the C-interface.
 
@@ -199,6 +200,49 @@ V = '3.45.1'.
 */
 sqlite_library_c_version( Cersion ) :-
      c_library_version( Cersion ).
+
+/** sqlite_build_version(-LibCVers).
+
+Get the version of the SQLITE against which the prosqlite binaries where compiled.
+
+==
+?- sqlite_build_version(LibCV).
+LibCV = '3.45.1'.
+
+?- sqlite_library_c_version(V).
+V = '3.45.1'.
+
+?- sqlite_connect('/tmp/testo.sqlite', testo, exists(false)).
+true.
+
+?- sqlite_library_version(V).
+V = 3:45:1.
+
+?- sqlite_disconnect.
+ERROR: Unknown procedure: sqlite_disconnect/0
+ERROR:     However, there are definitions for:
+ERROR:         prosqlite:sqlite_disconnect/1
+ERROR:         prosqlite:sqlite_disconnect/2
+false.
+
+?- sqlite_disconnect_all.
+ERROR: Unknown procedure: sqlite_disconnect_all/0 (DWIM could not correct goal)
+^  Exception: (4) setup_call_cleanup('$toplevel':notrace(call_repl_loop_hook(begin, 0)), '$toplevel':'$query_loop'(0), '$toplevel':notrace(call_repl_loop_hook(end, 0))) ? Unknown option (h for help)
+^  Exception: (4) setup_call_cleanup('$toplevel':notrace(call_repl_loop_hook(begin, 0)), '$toplevel':'$query_loop'(0), '$toplevel':notrace(call_repl_loop_hook(end, 0))) ? Unknown option (h for help)
+^  Exception: (4) setup_call_cleanup('$toplevel':notrace(call_repl_loop_hook(begin, 0)), '$toplevel':'$query_loop'(0), '$toplevel':notrace(call_repl_loop_hook(end, 0))) ? abort
+% Execution Aborted
+?- sqlite_disconnet(testo).
+Correct to: "sqlite_disconnect(testo)"? yes
+true.
+==
+
+@author  nicos angelopoulos
+@version 0.1, 2024/8/14
+
+*/
+
+sqlite_build_version( Bersion ) :-
+     c_library_version( Bersion ).
 
 /** sqlite_library_version(-LibVers).
     sqlite_library_version(+Alias, -LibVers).
