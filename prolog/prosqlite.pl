@@ -19,6 +19,7 @@
             sqlite_binary_version/2,    % -Version, -Date
             sqlite_library_version/1,   % -Version
             sqlite_library_version/2,   % +Alias, -Version
+            sqlite_library_c_version/1, % -Version
             sqlite_citation/2           % -Atom, Bibterm
           ] ).
 
@@ -183,8 +184,22 @@ D1 = date(2024, 7, 6).
 sqlite_binary_version( Ver, Date ) :-
      c_sqlite_version( Ver, Date ).
 
-/** sqlite_library_version(-Lersion).
-    sqlite_library_version(+Alias, -Lersion).
+/** sqlite_library_version(-LibVers).
+
+Get the vesion of the SQLite version via the C-interface.
+
+==
+==
+
+@author  nicos angelopoulos
+@version 0.1, 2024/8/14
+
+*/
+sqlite_library_c_version( Cersion ) :-
+     c_library_version( Cersion ).
+
+/** sqlite_library_version(-LibVers).
+    sqlite_library_version(+Alias, -LibVers).
 
 Get the version of the underlying sqlite library. Either uses Alias or default connection (which should exist).
 
