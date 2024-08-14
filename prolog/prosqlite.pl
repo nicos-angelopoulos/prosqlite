@@ -205,6 +205,8 @@ sqlite_library_c_version( Cersion ) :-
 
 Get the version of the SQLITE against which the prosqlite binaries where compiled.
 
+The Atom is bound to the SQLITE_VERSION macro from the SQLite sources at compile time.
+
 ==
 ?- sqlite_build_version(LibCV).
 LibCV = '3.45.1'.
