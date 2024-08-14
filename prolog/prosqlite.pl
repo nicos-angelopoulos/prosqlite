@@ -259,6 +259,8 @@ false.
 
 ?- sqlite_library_version(V).
 V = '3.37.2'.
+
+?- sqlite_disconnect(testo).
 ==
 
 @author  nicos angelopoulos
