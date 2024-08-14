@@ -216,7 +216,7 @@ V = '3.45.1'.
 true.
 
 ?- sqlite_library_version(V).
-V = 3:45:1.
+V = '3.45.1'.
 
 ?- sqlite_disconnect.
 ERROR: Unknown procedure: sqlite_disconnect/0
@@ -250,7 +250,6 @@ sqlite_build_version( Bersion ) :-
 Get the version of the underlying sqlite library. Either uses Alias or default connection (which should exist).
 
 This version uses the query interface so it expects a default connection to have been established. 
-This can also be implemented via C:sqlite3_libversion(). 
 
 ==
 ?- sqlite_library_version(V). 
@@ -259,27 +258,27 @@ false.
 ?- sqlite_connect('/tmp/testo.sqlite', testo, exists(false)).
 
 ?- sqlite_library_version(V).
-V = 3:37:2.
+V = '3.37.2'.
 ==
 
 @author  nicos angelopoulos
 @version 0.1, 2024/8/3
+@see sqlite_library_c_version/1
+@see sqlite_build_version/1
 
 */
 sqlite_library_version( V ) :-
      sqlite_query( 'SELECT sqlite_version()', Row ),
-     Row = row(Atm),
-     atomic_list_concat([Mj,Mn,Fx],'.',Atm),
-     maplist( atom_number, [Mj,Mn,Fx], [Nj,Nn,Nx] ),
-     V = Nj:Nn:Nx,
+     Row = row(V),
+     % first draft was like below, but changed to chime with sqlite_library_c_version/1 and sqlite_build/1
+     % Row = row(Atm),
+     % atomic_list_concat([Mj,Mn,Fx],'.',Atm),
+     % maplist( atom_number, [Mj,Mn,Fx], [Nj,Nn,Nx] ),
+     % V = Nj:Nn:Nx,
      !.
 sqlite_library_version( Alias, V ) :-
      sqlite_query( Alias, 'SELECT sqlite_version()', Row ),
-     Row = row(Atm),
-     atomic_list_concat([Mj,Mn,Fx],'.',Atm),
-     maplist( atom_number, [Mj,Mn,Fx], [Nj,Nn,Nx] ),
-     V = Nj:Nn:Nx,
-     !.
+     Row = row(V).
 
 %% sqlite_citation( -Atom, -Bibterm ).
 % Succeeds once for each publication related to this library. Atom is the atom representation
