@@ -189,6 +189,8 @@ sqlite_binary_version( Ver, Date ) :-
 Get the vesion of the SQLite version via the C-interface.
 
 ==
+?- sqlite_library_c_version(V).
+V = '3.45.1'.
 ==
 
 @author  nicos angelopoulos
