@@ -230,8 +230,8 @@ static foreign_t c_sqlite_version(term_t ver, term_t datem)
 {
     term_t tmp = PL_new_term_ref();
 	 // 1:0:0,  date(2014,12,23)
-    if ( PL_unify_term(tmp,PL_FUNCTOR_CHARS,":",2,PL_INT, 4, PL_INT, 0) &&    // Minor + Fix
-         PL_unify_term(ver,PL_FUNCTOR_CHARS,":",2,PL_INT, 1, PL_TERM, tmp ) &&   // Major
+    if ( PL_unify_term(tmp,PL_FUNCTOR_CHARS,":",2,PL_INT, 0, PL_INT, 0) &&    // Minor + Fix
+         PL_unify_term(ver,PL_FUNCTOR_CHARS,":",2,PL_INT, 2, PL_TERM, tmp ) &&   // Major
          PL_unify_term(datem,PL_FUNCTOR_CHARS,"date",3,PL_INT, 2018, PL_INT, 3, PL_INT, 17) )
          // 1:1:0, 2016,10,9
          // 1:3:0, 2018,3,17,  proper support for blobs (see examples/two.pl)
