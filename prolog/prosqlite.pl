@@ -54,7 +54,6 @@ If you use prosqlite in your research, please consider citing this publication.
 The library has been developed and tested on SWI 6.3.2 but it should 
 also work on YAP Prolog.
 
-
 The easiest way to install on SWI is via the package manager. 
 Simply do:
 ==
@@ -123,7 +122,7 @@ led to publication of v2.0.
 @version 1.6, 2020/5/29  recompiled for SWI 8.2
 @version 1.7, 2022/4/30  print message if new db file cannot be created
 @version 1.8, 2022/5/29  fixed major bug of deleting existing files introduced in 1.7 + minor doc + aarch64-linux binary
-@version 2.0  2024/?/?   better error propagation & nulls, keywords as fields, library_version, disconnect remove_predicates option
+@version 2.0  2024/8/15  better error propagation & nulls, keywords as fields, library + c + build versions, disconnect remove_predicates option
 @license    MIT
 @author Nicos Angelopoulos
 @author Sander Canisius
@@ -153,13 +152,13 @@ arity_flag_values( [arity,unary,both,palette] ).
 %
 %==
 % ? sqlite_version(V, D).
-% V = 1:8:0,
-% D = date(2022, 5, 29).
+% V = 2:0:0,
+% D = date(2024, 8, 15).
 %==
 %
 % @author nicos angelopoulos
 %
-sqlite_version(1:8:3, date(2024,8,3)).
+sqlite_version(2:0:0, date(2024,8,15)).
 
 /** sqlite_binary_version( -Version, -Date ).
 
