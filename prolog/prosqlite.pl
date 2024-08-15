@@ -51,15 +51,16 @@ facilitates the viewing of database tables as predicates.
 See the publication pointed to by sqlite_citation/2, for further details.
 If you use prosqlite in your research, please consider citing this publication.
 
-The library has been developed and tested on SWI 6.3.2 but it should 
-also work on YAP Prolog.
+The library has been developed and tested on SWI 6.3.2 and latest version was tested on 9.3.9.
 
 The easiest way to install on SWI is via the package manager. 
 Simply do:
 ==
-     ?- pack_install( prosqlite ).
+     ?- pack_install(prosqlite).
 ==
-And you are good to go.
+You will also need the sqlite3{.so,.dll} in your path. If you have difficulties in MS platforms 
+try dropping sqlite3.dll in installed prosqlite/lib/x86_64/ directory (or prosqlite/lib/i386-win32 if you are on 32 bits).
+Alternative place it in SWI's bin/ directory.
 
 There are good/full examples in the sources, directory examples/.
 For instance test by :
@@ -101,6 +102,26 @@ the sqlite engine.
 There are MS wins DLLs included  in the sources and recent version of the SWI package
 manager will install these properly.
 
+---++ Predicates on Versions
+
+There is a battery of predicates about versions. Some of these can be used to debug issues between 
+compiled and loaded versions of SQLite, although we never had any issues and seems they have good 
+backward compatibility.
+
+Predicates
+  * sqlite_version(V,D)
+    * prosqlite pack Version in Pl term (Mj:Mn) and date (date(Y,M,D)) the version was published 
+  * sqlite_binary_version(Vb,Db)
+    * prosqlite binary (c/prosqlite.c) version and date. This might be running behind the overall pack version as it is only synchronised when prosqlite.c is changed
+  * sqlite_build_version(Bv)
+    * the atomic version SQLite headers against which prosqlite.c was compiled (SQLIte's SQLITE_VERSION macro)
+  * sqlite_library_c_version(Cv)
+    * the runtime atomic version of the SQLite binary that can be reached from prosqlite- through sqlite3_libversion() c function call
+  * sqlite_library_version([Alias,] Lv)
+    * the runtime atomic version of the SQLite binary that can has been reached in a current connection (via query interface, should be identical to Cv above)
+
+---++ Thanks
+
 Thanks to Samer Abdallah for 2 fixes. One on mapping blobs to strings and 
 second for handling UTF text correctly.
 
@@ -112,8 +133,9 @@ Thanks to Wolfram Diestel for spotting a bug in opening 2 dbs with distinct alia
 
 Thanks to Steve Moyle for contributing safe_column_names/2 (Nov 2016).
 
-Thanks to John B Thiel (JBThiel) for opening a number of issues that when addressed 
-led to publication of v2.0.
+Thanks to John B Thiel (JBThiel) for opening a number of issues which led to v2.0.
+
+---++ History
 
 @version 1.0, 2014/12/24
 @version 1.1, 2016/10/9  changed to sqlite3_close() and fixed alias bug
@@ -127,7 +149,7 @@ led to publication of v2.0.
 @author Nicos Angelopoulos
 @author Sander Canisius
 @see Sander Canisius, Nicos Angelopoulos and Lodewyk Wessels. proSQLite: Prolog file based databases via an SQLite interface.  In the proceedings of Practical Aspects of Declarative languages (PADL 2013), (2013, Rome, Italy).
-@see Sander Canisius, Nicos Angelopoulos and Lodewyk Wessels.  Exploring file based databases via an Sqlite interface.  In the ICLP Workshop on Logic-based methods in Programming Environments, p. 2-9, (2012, Budapest, Hungary).
+@see Sander Canisius, Nicos Angelopoulos and Lodewyk Wessels.  Exploring file based databases via an SQLite interface.  In the ICLP Workshop on Logic-based methods in Programming Environments, p. 2-9, (2012, Budapest, Hungary).
 @see http://stoics.org.uk/~nicos/pbs/padl2013-prosqlite.pdf
 @see http://stoics.org.uk/~nicos/sware/prosqlite
 @see http://stoics.org.uk/~nicos/sware/db_facts
